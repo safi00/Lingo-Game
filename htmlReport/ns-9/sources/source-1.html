@@ -1,0 +1,96 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > WordRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">nl.hu.cisq1.lingo.words.data</a>
+</div>
+
+<h1>Coverage Summary for Class: WordRepository (nl.hu.cisq1.lingo.words.data)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+</tr>
+  <tr>
+    <td class="name">WordRepository$MockitoMock$oXODNl3W</td>
+  </tr>
+  <tr>
+    <td class="name">WordRepository$MockitoMock$oXODNl3W$auxiliary$mjZ9cf9d</td>
+  </tr>
+  <tr>
+    <td class="name">WordRepository$MockitoMock$oXODNl3W$auxiliary$tmJdcJuI</td>
+  </tr>
+  <tr>
+    <td class="name">WordRepository$MockitoMock$oXODNl3W$auxiliary$wMFqdwZW</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package nl.hu.cisq1.lingo.words.data;
+&nbsp;
+&nbsp;import nl.hu.cisq1.lingo.words.domain.Word;
+&nbsp;import org.springframework.data.jpa.repository.JpaRepository;
+&nbsp;import org.springframework.data.jpa.repository.Query;
+&nbsp;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * We depend on an interface,
+&nbsp; * Spring generates an implementation based on our configured adapters
+&nbsp; * (see: application.properties and pom.xml)
+&nbsp; */
+&nbsp;public interface WordRepository extends JpaRepository&lt;Word, String&gt; {
+&nbsp;    @Query(nativeQuery=true, value=&quot;SELECT * FROM words w WHERE w.length = ?1 ORDER BY random() LIMIT 1&quot;)
+&nbsp;    Optional&lt;Word&gt; findRandomWordByLength(Integer length);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-03-04 18:46</div>
+</div>
+</body>
+</html>

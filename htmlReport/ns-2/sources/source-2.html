@@ -1,0 +1,309 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > Game</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">nl.hu.cisq1.lingo.trainer.domain</a>
+</div>
+
+<h1>Coverage Summary for Class: Game (nl.hu.cisq1.lingo.trainer.domain)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Game</td>
+<td class="coverageStat">
+  <span class="percent">
+    90%
+  </span>
+  <span class="absValue">
+    (18/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.2%
+  </span>
+  <span class="absValue">
+    (52/64)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Game$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    90.5%
+  </span>
+  <span class="absValue">
+    (19/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    81.8%
+  </span>
+  <span class="absValue">
+    (54/66)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package nl.hu.cisq1.lingo.trainer.domain;
+&nbsp;import jakarta.persistence.*;
+&nbsp;import nl.hu.cisq1.lingo.trainer.domain.Enums.GameState;
+&nbsp;import nl.hu.cisq1.lingo.trainer.domain.Enums.RoundState;
+&nbsp;import nl.hu.cisq1.lingo.trainer.exceptions.*;
+&nbsp;import nl.hu.cisq1.lingo.words.domain.Word;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;//@Entity
+&nbsp;public class Game {
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+&nbsp;    @Column(name = &quot;game_id&quot;)
+&nbsp;    private Long gameID;
+&nbsp;    private String playerName;
+&nbsp;    private int score;
+&nbsp;    private List&lt;Round&gt; listOfRounds;
+&nbsp;    private GameState gameState;
+&nbsp;
+<b class="nc">&nbsp;    public Game(){</b>
+&nbsp;    }
+<b class="fc">&nbsp;    public Game(String playerName){</b>
+<b class="fc">&nbsp;        setGameState(GameState.Setup);</b>
+&nbsp;
+<b class="fc">&nbsp;        this.playerName = playerName;</b>
+<b class="fc">&nbsp;        this.score = 0;</b>
+<b class="fc">&nbsp;        this.listOfRounds = new ArrayList&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void startGame() {
+<b class="fc">&nbsp;        setGameState(GameState.Playing);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void pauseGame() {
+<b class="fc">&nbsp;        calculateGameScore();</b>
+<b class="fc">&nbsp;        setGameState(GameState.Paused);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void stopGame() {
+<b class="fc">&nbsp;        calculateGameScore();</b>
+<b class="fc">&nbsp;        setGameState(GameState.Stopped);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int calculateGameScore(){
+<b class="fc">&nbsp;        int totalScore = 0;</b>
+&nbsp;
+<b class="fc">&nbsp;        if (getAmountOfRounds() &gt; 0){</b>
+<b class="fc">&nbsp;            for (int index = 0; index &lt; getAmountOfRounds(); index++){</b>
+<b class="fc">&nbsp;                Round round = getListOfRounds().get(index);</b>
+<b class="fc">&nbsp;                if (round.getRoundState() != RoundState.Playing){</b>
+<b class="fc">&nbsp;                    totalScore = totalScore +  (5 * (5 - round.getRoundAttemptAmount()) + 5);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        else {
+<b class="nc">&nbsp;            throw new EmptyRoundListException();</b>
+&nbsp;        }
+<b class="fc">&nbsp;        setScore(totalScore);</b>
+<b class="fc">&nbsp;        return totalScore;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getAmountOfRounds(){
+<b class="fc">&nbsp;        return getListOfRounds().size();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isAbleToStartANewRound(){
+<b class="fc">&nbsp;        switch(this.gameState){</b>
+&nbsp;            case Setup -&gt; {
+<b class="fc">&nbsp;                return true;</b>
+&nbsp;            }
+&nbsp;            case Playing -&gt; {
+<b class="fc">&nbsp;                getLastRound().isRoundWon();</b>
+<b class="fc">&nbsp;                switch (getLastRound().getRoundState()){</b>
+&nbsp;                    case Playing, Lost -&gt; {
+<b class="fc">&nbsp;                        return false;</b>
+&nbsp;                    }
+&nbsp;                    case Won -&gt; {
+<b class="fc">&nbsp;                        return true;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;            case Paused, Stopped -&gt; {
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;    public boolean isGameOver(){
+<b class="fc">&nbsp;        if (getAmountOfRounds() &gt; 0){</b>
+<b class="fc">&nbsp;            switch (getLastRound().getRoundState()){</b>
+&nbsp;                case Playing, Won -&gt; {
+<b class="fc">&nbsp;                    setGameState(GameState.Playing);</b>
+<b class="fc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;                case Lost -&gt; {
+<b class="fc">&nbsp;                    setGameState(GameState.Stopped);</b>
+<b class="fc">&nbsp;                    return true;</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        else {
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new StateException(&quot;Round&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Round createNewRound(Word roundWord) {
+<b class="fc">&nbsp;        if (isAbleToStartANewRound()){</b>
+<b class="fc">&nbsp;            if (getListOfRounds().isEmpty()) {</b>
+<b class="fc">&nbsp;                return createRound(roundWord);</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                switch (getLastRound().getRoundState()){</b>
+<b class="nc">&nbsp;                    case Playing -&gt; throw new GameOngoingException(&quot;The last round has not finished yet, &quot; +</b>
+&nbsp;                            &quot;finish the the round and then try to make a new round.&quot;);
+&nbsp;                    case Won -&gt; {
+<b class="fc">&nbsp;                        return createRound(roundWord);</b>
+&nbsp;                    }
+&nbsp;                    case Lost -&gt; {
+<b class="nc">&nbsp;                        stopGame();</b>
+<b class="nc">&nbsp;                        throw new GameOverException(&quot;Max attempts was already reached last round.&quot;);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }else{
+<b class="fc">&nbsp;            throw new GameOverException(&quot;Game is already over.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        throw new StateException(&quot;Game&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Round createRound(Word roundWord) {
+<b class="fc">&nbsp;        startGame();</b>
+<b class="fc">&nbsp;        Round round = new Round(roundWord);</b>
+<b class="fc">&nbsp;        listOfRounds.add(round);</b>
+<b class="fc">&nbsp;        calculateGameScore();</b>
+<b class="fc">&nbsp;        return round;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Round getLastRound() {
+<b class="fc">&nbsp;        if (listOfRounds.size() &gt; 0){</b>
+<b class="fc">&nbsp;            return listOfRounds.get(listOfRounds.size() - 1);</b>
+&nbsp;        }
+&nbsp;        else {
+<b class="nc">&nbsp;            throw new EmptyRoundListException();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    public int getLastRoundsWordLength() {
+<b class="fc">&nbsp;        return getLastRound().getRoundWordSize();</b>
+&nbsp;    }
+&nbsp;    //region Setters &amp; Getters
+&nbsp;
+&nbsp;    public void setScore(int score) {
+<b class="fc">&nbsp;        this.score = score;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setGameState(GameState gameState) {
+<b class="fc">&nbsp;        this.gameState = gameState;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Long getGameID() {
+<b class="nc">&nbsp;        return gameID;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPlayerName() {
+<b class="fc">&nbsp;        return playerName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getScore() {
+<b class="fc">&nbsp;        return score;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Round&gt; getListOfRounds() {
+<b class="fc">&nbsp;        return listOfRounds;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public GameState getGameState() {
+<b class="fc">&nbsp;        return gameState;</b>
+&nbsp;    }
+&nbsp;    //endregion
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-03-04 18:46</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > Feedback</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">nl.hu.cisq1.lingo.trainer.domain</a>
+</div>
+
+<h1>Coverage Summary for Class: Feedback (nl.hu.cisq1.lingo.trainer.domain)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Feedback</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    84.6%
+  </span>
+  <span class="absValue">
+    (11/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.9%
+  </span>
+  <span class="absValue">
+    (63/65)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package nl.hu.cisq1.lingo.trainer.domain;
+&nbsp;
+&nbsp;import jakarta.persistence.*;
+&nbsp;import nl.hu.cisq1.lingo.trainer.domain.Enums.Mark;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;//@Entity
+&nbsp;public class Feedback {
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+&nbsp;    @Column(name = &quot;feedback_id&quot;)
+&nbsp;    private long feedbackID;
+&nbsp;    private List&lt;Mark&gt; prevMarkList;
+&nbsp;    private List&lt;Mark&gt; markList;
+&nbsp;    private String hint;
+&nbsp;    private String wordGuessed;
+&nbsp;    private String roundWord;
+<b class="nc">&nbsp;    public Feedback() {</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public Feedback(String roundWord, String attemptedWord, String prevHint, List&lt;Mark&gt; marklist) {</b>
+<b class="fc">&nbsp;        this.roundWord = roundWord;</b>
+<b class="fc">&nbsp;        this.wordGuessed = attemptedWord;</b>
+<b class="fc">&nbsp;        this.prevMarkList = marklist;</b>
+<b class="fc">&nbsp;        this.markList = generateNewMarkList();</b>
+<b class="fc">&nbsp;        this.hint = generateNewHint(prevHint);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Mark&gt; generateNewMarkList() {
+<b class="fc">&nbsp;        char[] roundWordList = stringToChar(roundWord);</b>
+<b class="fc">&nbsp;        char[] wordGuessedList = stringToChar(wordGuessed);</b>
+<b class="fc">&nbsp;        List&lt;String&gt; dummyCharacterList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        int roundWordLength = roundWord.length();</b>
+&nbsp;
+<b class="fc">&nbsp;        List&lt;Mark&gt; returnList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        generateABlankMarkList(returnList, roundWordLength);</b>
+&nbsp;
+&nbsp;        // If their not the same size end immediately,
+&nbsp;        // if they are then make the dummy list to compare them
+<b class="fc">&nbsp;        if (roundWordLength != wordGuessed.length()) {</b>
+<b class="fc">&nbsp;            for (int index = 0; index &lt; roundWordLength; index++) {</b>
+<b class="fc">&nbsp;                returnList.set(index, Mark.INVALID);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            return returnList;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            for (char letter : roundWordList) {</b>
+<b class="fc">&nbsp;                dummyCharacterList.add(String.valueOf(letter));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        for (int index = 0; index &lt; roundWordLength; index++) {</b>
+<b class="fc">&nbsp;            if (wordGuessedList[index] == roundWordList[index]) {</b>
+<b class="fc">&nbsp;                returnList.set(index, Mark.CORRECT);</b>
+<b class="fc">&nbsp;                dummyCharacterList.set(index, null);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        for (int index = 0; index &lt; roundWordLength; index++) {</b>
+<b class="fc">&nbsp;            if (dummyCharacterList.get(index) != null) {</b>
+<b class="fc">&nbsp;                int charIndex = dummyCharacterList.indexOf(String.valueOf(wordGuessedList[index]));</b>
+<b class="fc">&nbsp;                if (charIndex &gt; -1) {</b>
+<b class="fc">&nbsp;                    returnList.set(index, Mark.PRESENT);</b>
+<b class="fc">&nbsp;                    dummyCharacterList.set(charIndex, &quot;gone&quot;);</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return returnList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String generateNewHint(String prevHint) {
+<b class="fc">&nbsp;        StringBuilder returnHint = new StringBuilder();</b>
+<b class="fc">&nbsp;        char[] roundWordList = stringToChar(roundWord);</b>
+<b class="fc">&nbsp;        char[] charHintList = stringToChar(prevHint);</b>
+<b class="fc">&nbsp;        List&lt;String&gt; dummyCharacterList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="fc">&nbsp;        for (char letter : charHintList) {</b>
+<b class="fc">&nbsp;            dummyCharacterList.add(String.valueOf(letter).toUpperCase());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        for (int index = 0; index &lt; 5; index++) {</b>
+<b class="fc">&nbsp;            if (Objects.equals(dummyCharacterList.get(index), &quot;.&quot;)) {</b>
+<b class="fc">&nbsp;                if (markList.get(index) == Mark.CORRECT) {</b>
+<b class="fc">&nbsp;                    dummyCharacterList.set(index, String.valueOf(roundWordList[index]).toUpperCase());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        for (String letter : dummyCharacterList) {</b>
+<b class="fc">&nbsp;            returnHint.append(letter);</b>
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return returnHint.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean isWordGuessed() {
+<b class="fc">&nbsp;        for (Mark mark : markList) {</b>
+<b class="fc">&nbsp;            if (mark == Mark.ABSENT) {</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (mark == Mark.PRESENT) {</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="fc">&nbsp;            if (mark == Mark.INVALID) {</b>
+<b class="fc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+<b class="fc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public char[] stringToChar(String string) {
+<b class="fc">&nbsp;        char[] returnList = new char[string.toLowerCase().length()];</b>
+&nbsp;        // Copy character by character into array
+<b class="fc">&nbsp;        for (int i = 0; i &lt; string.length(); i++) {</b>
+<b class="fc">&nbsp;            returnList[i] = string.toLowerCase().charAt(i);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return returnList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void generateABlankMarkList(List&lt;Mark&gt; list, int length) {
+<b class="fc">&nbsp;        for (int i = 0; i &lt; length; i++) {</b>
+<b class="fc">&nbsp;            list.add(Mark.ABSENT);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    //region Setters &amp; Getters
+&nbsp;
+&nbsp;    public long getFeedbackID() {
+<b class="nc">&nbsp;        return feedbackID;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Mark&gt; getMarkList() {
+<b class="fc">&nbsp;        return markList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Mark&gt; getPrevMarkList() {
+<b class="fc">&nbsp;        return prevMarkList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getHint() {
+<b class="fc">&nbsp;        return hint;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getWordGuessed() {
+<b class="fc">&nbsp;        return wordGuessed;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRoundWord() {
+<b class="fc">&nbsp;        return roundWord;</b>
+&nbsp;    }
+&nbsp;    //endregion
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-03-04 18:46</div>
+</div>
+</body>
+</html>

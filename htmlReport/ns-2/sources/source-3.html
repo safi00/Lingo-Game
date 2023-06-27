@@ -1,0 +1,269 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > Round</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">nl.hu.cisq1.lingo.trainer.domain</a>
+</div>
+
+<h1>Coverage Summary for Class: Round (nl.hu.cisq1.lingo.trainer.domain)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Round</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (15/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.2%
+  </span>
+  <span class="absValue">
+    (45/51)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Round$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (15/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86.5%
+  </span>
+  <span class="absValue">
+    (45/52)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package nl.hu.cisq1.lingo.trainer.domain;
+&nbsp;
+&nbsp;import jakarta.persistence.*;
+&nbsp;import nl.hu.cisq1.lingo.trainer.domain.Enums.Mark;
+&nbsp;import nl.hu.cisq1.lingo.trainer.domain.Enums.RoundState;
+&nbsp;import nl.hu.cisq1.lingo.trainer.exceptions.*;
+&nbsp;import nl.hu.cisq1.lingo.words.domain.Word;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;//@Entity
+&nbsp;public class Round {
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+&nbsp;    @Column(name = &quot;round_id&quot;)
+&nbsp;    private Long roundID;
+&nbsp;    private String roundWord;
+&nbsp;    private String startingHint;
+&nbsp;    private int roundAttemptAmount;
+&nbsp;    private int roundWordSize;
+&nbsp;    private List&lt;Feedback&gt; feedbackList;
+&nbsp;    private RoundState roundState;
+&nbsp;
+<b class="nc">&nbsp;    public Round() {</b>
+&nbsp;    }
+<b class="fc">&nbsp;    public Round(Word roundWord) {</b>
+<b class="fc">&nbsp;        this.roundWord = roundWord.getValue();</b>
+<b class="fc">&nbsp;        this.roundAttemptAmount = 0;</b>
+<b class="fc">&nbsp;        this.feedbackList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        this.roundWordSize = roundWord.getLength();</b>
+<b class="fc">&nbsp;        this.startingHint = startingHintMaker(this.roundWord);</b>
+<b class="fc">&nbsp;        setRoundState(RoundState.Playing);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String startingHintMaker(String roundWord) {
+<b class="fc">&nbsp;        return roundWord.toUpperCase().charAt(0) +</b>
+<b class="fc">&nbsp;                &quot;.&quot;.repeat(Math.max(0, (roundWordSize - 1)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Feedback getLastFeedBack() {
+<b class="fc">&nbsp;        if (roundAttemptAmount &lt; 1) {</b>
+<b class="fc">&nbsp;            throw new EmptyFeedbackListException();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return getFeedbackList().get(roundAttemptAmount - 1);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getLastHint() {
+<b class="fc">&nbsp;        if (roundAttemptAmount &lt; 1) {</b>
+<b class="fc">&nbsp;            return startingHint;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return getLastFeedBack().getHint();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Mark&gt; getLastMarkList() {
+<b class="fc">&nbsp;        if (roundAttemptAmount &lt; 1) {</b>
+<b class="fc">&nbsp;            return makeStartingMarkList();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            return getLastFeedBack().getMarkList();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean input(String attemptedWord) {
+<b class="fc">&nbsp;        if(roundState == RoundState.Playing){</b>
+<b class="fc">&nbsp;            if (roundAttemptAmount &lt; 5) {</b>
+<b class="fc">&nbsp;                Feedback feedback = new Feedback(roundWord, attemptedWord, getLastHint(), getLastMarkList());</b>
+<b class="fc">&nbsp;                feedbackList.add(feedback);</b>
+<b class="fc">&nbsp;                roundAttemptAmount += 1;</b>
+<b class="fc">&nbsp;                return true;</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                throw new MaxAttemptsException();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;        else{
+<b class="nc">&nbsp;            switch (roundState){</b>
+<b class="nc">&nbsp;                case Lost -&gt; throw new RoundLostException();</b>
+<b class="nc">&nbsp;                case Won -&gt; throw new RoundWonException();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean isRoundWon() {
+<b class="fc">&nbsp;        if (getLastFeedBack().isWordGuessed()) {</b>
+<b class="fc">&nbsp;            setRoundState(RoundState.Won);</b>
+<b class="fc">&nbsp;            return true;</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            if (getRoundAttemptAmount() &gt; 4) {</b>
+<b class="fc">&nbsp;                setRoundState(RoundState.Lost);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;Mark&gt; makeStartingMarkList() {
+<b class="fc">&nbsp;        List&lt;Mark&gt; returnList = new ArrayList&lt;&gt;();</b>
+<b class="fc">&nbsp;        returnList.add(Mark.CORRECT);</b>
+<b class="fc">&nbsp;        returnList.add(Mark.ABSENT);</b>
+<b class="fc">&nbsp;        returnList.add(Mark.ABSENT);</b>
+<b class="fc">&nbsp;        returnList.add(Mark.ABSENT);</b>
+<b class="fc">&nbsp;        returnList.add(Mark.ABSENT);</b>
+&nbsp;
+<b class="fc">&nbsp;        return returnList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    //region Setters &amp; Getters
+&nbsp;    public void setRoundState(RoundState roundState) {
+<b class="fc">&nbsp;        this.roundState = roundState;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Long getRoundID() {
+<b class="nc">&nbsp;        return roundID;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getRoundWord() {
+<b class="fc">&nbsp;        return roundWord;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getStartingHint() {
+<b class="fc">&nbsp;        return startingHint;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getRoundAttemptAmount() {
+<b class="fc">&nbsp;        return roundAttemptAmount;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getRoundWordSize() {
+<b class="fc">&nbsp;        return roundWordSize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Feedback&gt; getFeedbackList() {
+<b class="fc">&nbsp;        return feedbackList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public RoundState getRoundState() {
+<b class="fc">&nbsp;        return roundState;</b>
+&nbsp;    }
+&nbsp;    //endregion
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-03-04 18:46</div>
+</div>
+</body>
+</html>

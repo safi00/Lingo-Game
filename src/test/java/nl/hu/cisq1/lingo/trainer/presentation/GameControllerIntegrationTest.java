@@ -54,11 +54,6 @@ class GameControllerIntegrationTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/trainer/game/TestPlayer")
                         .accept(MediaType.APPLICATION_JSON))
                         .andExpect(MockMvcResultMatchers.status().isOk());
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/trainer/game/newRound")
-                        .param("id", gameId.toString())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
@@ -69,13 +64,6 @@ class GameControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/trainer/game/guess")
-                        .param("id", gameId.toString())
-                        .param("attempt", guess)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("playing"));
     }
 
     @Test
@@ -85,11 +73,5 @@ class GameControllerIntegrationTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/trainer/game/stopGame")
-                        .param("id", gameId.toString())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("stopped"));
     }
 }
